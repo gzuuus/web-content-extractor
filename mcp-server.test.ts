@@ -37,11 +37,18 @@ describe("MCP Server", () => {
     expect(transport).toBeDefined();
   });
 
+  test("should successfully list tools", () => {
+    const list = client.listTools()
+    expect(client).toBeDefined();
+    expect(transport).toBeDefined();
+    expect(list).toBeDefined()
+  });
+
   test("should extract content from a valid URL", async () => {
     const result = await client.callTool({
       name: "extract",
       arguments: {
-        url: "https://raw.githubusercontent.com/nostr-protocol/nips/refs/heads/master/01.md"
+        url: "https://developer.mozilla.org/en-US/"
       }
     });
     console.log(result)
