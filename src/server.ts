@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import type { ContentExtractionResult } from './types';
 import { extractContent } from './extractor';
+import type { ParseResult } from 'mozilla-readability';
 
 const app = new Hono();
 
@@ -11,7 +11,7 @@ app.post('/extract', async c => {
       return c.json({ error: 'URL is required' }, 400);
     }
 
-    const content: ContentExtractionResult = await extractContent(url);
+    const content: ParseResult = await extractContent(url);
 
     return c.json(content);
   } catch (error) {

@@ -10,38 +10,69 @@ const server = new McpServer({
 });
 
 // Define the extract tool
-server.tool('extract', { url: z.string().url() }, async ({ url }) => {
-  try {
-    const result = await extractContent(url);
+server.tool(
+  'extract',
+  {
+    url: z.string().url()
+  },
+  async ({ url }) => {
+    console.info(`Starting content extraction for: ${url}`);
 
-    // Format the response in a readable way
-    const content = [
-      { type: 'text' as const, text: `Title: ${result.title}\n\n` },
-      { type: 'text' as const, text: `Site: ${result.siteName || 'Unknown'}\n` },
-      { type: 'text' as const, text: `Author: ${result.byline || 'Unknown'}\n\n` },
-      { type: 'text' as const, text: result.content },
-    ];
-
-    return {
-      content,
-      metadata: {
-        isReadable: result.isReadable,
+    try {
+      const result = await extractContent(url);
+      console.debug('Extraction result:', {
+        title: result.title,
         contentLength: result.length,
-        excerpt: result.excerpt,
-      },
-    };
-  } catch (error) {
-    return {
-      content: [
+        isReadable: result.isReadable,
+      });
+
+      // Format the response in a more structured way
+      const content = [
         {
-          type: 'text',
-          text: `Error extracting content: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          type: 'text' as const,
+          text: `# ${result.title}\n\n`
         },
-      ],
-      isError: true,
-    };
+        {
+          type: 'text' as const,
+          text: result.siteName ? `Source: ${result.siteName}\n` : ''
+        },
+        {
+          type: 'text' as const,
+          text: result.byline ? `Author: ${result.byline}\n\n` : '\n'
+        },
+        {
+          type: 'text' as const,
+          text: '## Content\n\n' + result.textContent
+        }
+      ].filter(item => item.text);
+
+      return {
+        content,
+        metadata: {
+          isReadable: result.isReadable,
+          contentLength: result.length,
+          excerpt: result.excerpt,
+          url: url
+        },
+      };
+    } catch (error) {
+      console.error('Extraction failed:', error);
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `Error extracting content: ${error instanceof Error ? error.message : 'Unknown error'}`
+          }
+        ],
+        isError: true,
+        metadata: {
+          error: error instanceof Error ? error.message : 'Unknown error',
+          url: url
+        }
+      };
+    }
   }
-});
+);
 
 // Add a prompt template for content extraction
 server.prompt('extract-and-summarize', { url: z.string().url() }, ({ url }) => ({

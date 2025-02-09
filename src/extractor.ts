@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 import { Readability } from '@mozilla/readability';
 import { JSDOM } from 'jsdom';
+import type { ParseResult } from 'mozilla-readability';
 
 // TODO: Accept cookies banner, e.g yt, g
 
@@ -211,7 +212,7 @@ export async function extractContent(url: string): Promise<any> {
       classesToPreserve: ['code', 'pre'],
     });
 
-    const article = reader.parse();
+    const article: ParseResult | null = reader.parse();
 
     if (!article) {
       const rawContent = document.body ? document.body.innerHTML : '';
