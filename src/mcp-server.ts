@@ -3,17 +3,16 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { extractContent } from './extractor';
 
-// Create an MCP server
 const server = new McpServer({
   name: 'Web Content Extractor',
   version: '1.0.0',
 });
 
-// Define the extract tool
 server.tool(
   'extract',
+  'Extract the content from a given url',
   {
-    url: z.string().url()
+    url: z.string().url(),
   },
   async ({ url }) => {
     console.info(`Starting content extraction for: ${url}`);
@@ -26,24 +25,23 @@ server.tool(
         isReadable: result.isReadable,
       });
 
-      // Format the response in a more structured way
       const content = [
         {
           type: 'text' as const,
-          text: `# ${result.title}\n\n`
+          text: `# ${result.title}\n\n`,
         },
         {
           type: 'text' as const,
-          text: result.siteName ? `Source: ${result.siteName}\n` : ''
+          text: result.siteName ? `Source: ${result.siteName}\n` : '',
         },
         {
           type: 'text' as const,
-          text: result.byline ? `Author: ${result.byline}\n\n` : '\n'
+          text: result.byline ? `Author: ${result.byline}\n\n` : '\n',
         },
         {
           type: 'text' as const,
-          text: '## Content\n\n' + result.textContent
-        }
+          text: '## Content\n\n' + result.textContent,
+        },
       ].filter(item => item.text);
 
       return {
@@ -52,7 +50,7 @@ server.tool(
           isReadable: result.isReadable,
           contentLength: result.length,
           excerpt: result.excerpt,
-          url: url
+          url: url,
         },
       };
     } catch (error) {
@@ -61,20 +59,19 @@ server.tool(
         content: [
           {
             type: 'text',
-            text: `Error extracting content: ${error instanceof Error ? error.message : 'Unknown error'}`
-          }
+            text: `Error extracting content: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          },
         ],
         isError: true,
         metadata: {
           error: error instanceof Error ? error.message : 'Unknown error',
-          url: url
-        }
+          url: url,
+        },
       };
     }
   }
 );
 
-// Add a prompt template for content extraction
 server.prompt('extract-and-summarize', { url: z.string().url() }, ({ url }) => ({
   messages: [
     {
