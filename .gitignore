@@ -178,3 +178,4 @@ dist
 codebase*
 .aider*
 mcp-client-go
+config*

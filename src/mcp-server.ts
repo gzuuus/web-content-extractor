@@ -9,7 +9,7 @@ const server = new McpServer({
 });
 
 server.tool(
-  'extract',
+  'extract-url-content',
   'Extract the content from a given url',
   {
     url: z.string().url(),
@@ -28,19 +28,11 @@ server.tool(
       const content = [
         {
           type: 'text' as const,
-          text: `# ${result.title}\n\n`,
-        },
-        {
-          type: 'text' as const,
-          text: result.siteName ? `Source: ${result.siteName}\n` : '',
-        },
-        {
-          type: 'text' as const,
-          text: result.byline ? `Author: ${result.byline}\n\n` : '\n',
-        },
-        {
-          type: 'text' as const,
-          text: '## Content\n\n' + result.textContent,
+          text:
+            (result.title ? `# ${result.title}\n\n` : '') +
+            (result.siteName ? `Source: ${result.siteName}\n` : '') +
+            (result.byline ? `Author: ${result.byline}\n\n` : '\n') +
+            `## Content\n\n${result.textContent}`,
         },
       ].filter(item => item.text);
 
@@ -87,6 +79,3 @@ server.prompt('extract-and-summarize', { url: z.string().url() }, ({ url }) => (
 // Start the server using stdio transport
 const transport = new StdioServerTransport();
 await server.connect(transport);
-
-// Log server start
-console.error('MCP Web Content Extractor Server started');

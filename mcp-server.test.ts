@@ -46,7 +46,7 @@ describe("MCP Server", () => {
 
   test("should extract content from a valid URL", async () => {
     const result = await client.callTool({
-      name: "extract",
+      name: "extract-url-content",
       arguments: {
         url: "https://developer.mozilla.org/en-US/"
       }
@@ -60,7 +60,7 @@ describe("MCP Server", () => {
   test("should handle invalid URLs with proper error", async () => {
     try {
       await client.callTool({
-        name: "extract",
+        name: "extract-url-content",
         arguments: {
           url: "not-a-valid-url"
         }
