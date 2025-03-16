@@ -10,7 +10,7 @@ const server = new McpServer({
 
 server.tool(
   'extract-url-content',
-  'Extract the content from a given url',
+  'Use this tool when you need to extract the content from a given url',
   {
     url: z.string().url(),
   },
